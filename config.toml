@@ -1,0 +1,16 @@
+[global]
+address = "127.0.0.1"
+port = 3333
+
+[server]
+enable = true
+
+[worker]
+enable = true
+headless = false
+workers = 2
+delay = 2
+
+[test]
+enable = true
+thread = 2

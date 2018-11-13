@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Geetest 3.0 - Task Receiver</title>
+</head>
+
+<body>
+    <p id="status" style="color:SlateBlue;font-size:24px;">接收任务</p>
+    <p id="session"></p>
+    <p id="gt"></p>
+    <p id="challenge"></p>
+    <p id="validate"></p>
+    <p id="seccode"></p>
+    <script src="//apps.bdimg.com/libs/jquery/1.9.1/jquery.js"></script>
+    <script src="static/gt.js"></script>
+    <script>
+        var session = "";
+        var refreshAfter = function(nms) {
+            setTimeout(function() {
+                $.ajax({
+                    url: 'feedback',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        session: session,
+                        code: -1,
+                    },
+                    complete: function() {
+                        location.reload();
+                    },
+                });
+            }, nms);
+        };
+        $.ajax({
+            url: "fetch?t=" + (new Date()).getTime(),
+            type: "get",
+            dataType: "json",
+            success: function(data) {
+                document.getElementById("status").style.color = "DodgerBlue";
+                document.getElementById("status").innerHTML = "加载验证码";
+                document.getElementById("session").innerHTML = "session: " + data.session;
+                document.getElementById("gt").innerHTML = "gt: " + data.gt;
+                session = data.session;
+                initGeetest({
+                    gt: data.gt,
+                    challenge: data.challenge,
+                    offline: !data.success,
+                    new_captcha: 1,
+                    product: "bind",
+                    width: "300px",
+                }, handler);
+                refreshAfter(30000);
+            },
+            error: function() {
+                refreshAfter(0);
+            },
+        });
+        var handler = function(captchaObj) {
+            captchaObj.onReady(function() {
+                document.getElementById("status").style.color = "Orange";
+                document.getElementById("status").innerHTML = "验证中";
+                captchaObj.verify();
+            }).onSuccess(function() {
+                document.getElementById("status").style.color = "MediumSeaGreen";
+                document.getElementById("status").innerHTML = "验证成功";
+                var result = captchaObj.getValidate();
+                document.getElementById("challenge").innerHTML = "challenge: " + result.geetest_challenge;
+                document.getElementById("validate").innerHTML = "validate: " + result.geetest_validate;
+                document.getElementById("seccode").innerHTML = "seccode: " + result.geetest_seccode;
+                $.ajax({
+                    url: 'feedback',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        session: session,
+                        code: 0,
+                        challenge: result.geetest_challenge,
+                        validate: result.geetest_validate,
+                        seccode: result.geetest_seccode
+                    },
+                });
+                refreshAfter(500);
+            }).onError(function() {
+                document.getElementById("status").style.color = "Tomato";
+                document.getElementById("status").innerHTML = "网络错误";
+                refreshAfter(500);
+            }).onClose(function() {
+                document.getElementById("status").style.color = "Tomato";
+                document.getElementById("status").innerHTML = "验证关闭";
+                refreshAfter(500);
+            });
+        };
+    </script>
+</body>
+
+</html>

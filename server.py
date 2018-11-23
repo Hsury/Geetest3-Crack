@@ -9,8 +9,8 @@ from uuid import uuid4
 
 app = Flask(__name__)
 
-cvPut = threading.Condition()
-cvGet = threading.Condition()
+cv_put = threading.Condition()
+cv_get = threading.Condition()
 
 workers = 0
 
@@ -25,7 +25,7 @@ def main(address="0.0.0.0", port=3333):
 
 @app.route("/")
 def root():
-    return f"<html><head><title>Geetest 3.0 - Status</title><meta http-equiv=\"refresh\" content=\"5\"></head><body>Geetest 3.0 Distributed Cracking Platform<br/>Developed by <a href=\"https://github.com/Hsury\">HsuRY</a><br/><br/>Workers: {workers + len(doing)}<br/><br/>Pending: {len(pending)}<br/>Doing: {len(doing)}<br/>Done: {len(done)}</body></html>"
+    return f"<html><head><title>Geetest3 - Status</title><meta http-equiv=\"refresh\" content=\"5\"></head><body>Geetest3 Distributed Cracking Platform<br /><a href=\"https://github.com/Hsury/Geetest3-Crack\">https://github.com/Hsury/Geetest3-Crack</a><br /><br />Workers: {workers + len(doing)}<br /><br />Pending: {len(pending)}<br />Doing: {len(doing)}<br />Done: {len(done)}</body></html>"
 
 @app.route("/crack")
 def crack():
@@ -40,10 +40,10 @@ def crack():
             'seccode': "",
         }
         pending.append(session)
-        with cvPut:
-            cvPut.notify_all()
-        with cvGet:
-            if cvGet.wait_for(lambda: session in done, timeout=30):
+        with cv_put:
+            cv_put.notify_all()
+        with cv_get:
+            if cv_get.wait_for(lambda: session in done, timeout=30):
                 # done.remove(session)
                 if tasks[session]['code'] == 0:
                     return jsonify({
@@ -91,8 +91,8 @@ def feedback():
                 tasks[session]['seccode'] = request.form.get('seccode')
             doing.remove(session)
             done.append(session)
-            with cvGet:
-                cvGet.notify_all()
+            with cv_get:
+                cv_get.notify_all()
             return jsonify({
                 'code': 0,
                 'message': "success",
@@ -112,8 +112,8 @@ def feedback():
 def fetch():
     global workers
     workers += 1
-    with cvPut:
-        if cvPut.wait_for(lambda: pending, timeout=15):
+    with cv_put:
+        if cv_put.wait_for(lambda: pending, timeout=15):
             session = pending.pop(0)
             doing.append(session)
             workers -= 1

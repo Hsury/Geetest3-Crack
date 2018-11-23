@@ -25,7 +25,7 @@ A user requests a captcha from a website and submit it to the server, then the c
 3. Use pip to install requirements
 
 ```
-python3.6 -m pip install flask gevent pillow requests selenium toml
+python3.6 -m pip install -U flask gevent pillow requests selenium toml
 ```
 
 4. Launch [run.py](https://github.com/Hsury/Geetest3-Crack/blob/master/run.py) to test the platform
@@ -33,6 +33,8 @@ python3.6 -m pip install flask gevent pillow requests selenium toml
 ```
 python3.6 run.py
 ```
+
+*More configuration can be modified in [config.toml](https://github.com/Hsury/Geetest3-Crack/blob/master/config.toml)*
 
 ## API
 
@@ -94,7 +96,7 @@ http://127.0.0.1:3333/status
 {'code': 0, 'workers': 1, 'pending': 0, 'doing': 1, 'done': 39}
 ```
 
-*Refer to [test.py](https://github.com/Hsury/Geetest3-Crack/blob/master/test.py) for more examples*
+*Refer to [api.py](https://github.com/Hsury/Geetest3-Crack/blob/master/api.py) and [test.py](https://github.com/Hsury/Geetest3-Crack/blob/master/test.py) for more examples*
 
 ## Disclaimer
 

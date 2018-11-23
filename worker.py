@@ -9,8 +9,8 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 
 def main(address="127.0.0.1", port=3333, headless=False, workers=2, delay=2):
-    def task(threadID):
-        time.sleep(threadID * delay)
+    def task(thread_id):
+        time.sleep(thread_id * delay)
         driver = create_driver(f"http://{address}:{port}/task", headless=headless)
         while True:
             try:
@@ -58,8 +58,8 @@ def save_base64img(data_str, save_name):
 def get_base64_by_canvas(driver, class_name, contain_type):
     bg_img = ""
     while len(bg_img) < 5000:
-        getImgJS = f"return document.getElementsByClassName(\"{class_name}\")[0].toDataURL(\"image/png\");"
-        bg_img = driver.execute_script(getImgJS)
+        get_img_js = f"return document.getElementsByClassName(\"{class_name}\")[0].toDataURL(\"image/png\");"
+        bg_img = driver.execute_script(get_img_js)
         time.sleep(0.5)
     if contain_type:
         return bg_img
